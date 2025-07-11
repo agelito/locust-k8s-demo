@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: locust-master
+  namespace: locust-k8s-demo
+  labels:
+    app: locust
+    role: master
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: locust
+      role: master
+  template:
+    metadata:
+      labels:
+        app: locust
+        role: master
+    spec:
+      containers:
+        - name: locust-master
+          image: locust-k8s-demo:latest
+          imagePullPolicy: Never
+          command: ["locust"]
+          args:
+            - "-f"
+            - "locustfile.py"
+            - "--master"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: locust-master
+  namespace: locust-k8s-demo
+  labels:
+    app: locust
+    role: master
+spec:
+  selector:
+    app: locust
+    role: master
+  ports:
+    - name: web
+      port: 8089
+      targetPort: 8089
+    - name: worker
+      port: 5557
+      targetPort: 5557
+  type: ClusterIP

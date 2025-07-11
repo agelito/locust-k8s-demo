@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: locust-worker
+  namespace: locust-k8s-demo
+  labels:
+    app: locust
+    role: worker
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: locust
+      role: worker
+  template:
+    metadata:
+      labels:
+        app: locust
+        role: worker
+    spec:
+      containers:
+        - name: locust-worker
+          image: locust-k8s-demo:latest
+          imagePullPolicy: Never
+          command: ["locust"]
+          args:
+            - "-f"
+            - "locustfile.py"
+            - "--worker"
+            - "--master-host=locust-master"
+            - "--master-port=5557"
